@@ -80,6 +80,7 @@ func (e *Event) String() (output string) {
 }
 
 type Server struct {
+	Address    string     // IP address to listen on. Default to empty string, i.e. all addresses
 	Port       string     // Port to listen on. Defaults to 80
 	Path       string     // Path to receive on. Defaults to "/postreceive"
 	Secret     string     // Option secret key for authenticating via HMAC
@@ -92,6 +93,7 @@ type Server struct {
 func NewServer() *Server {
 	return &Server{
 		Port:       "80",
+		Address:    "",
 		Path:       "/postreceive",
 		IgnoreTags: true,
 		Events:     make(chan Event, 10), // buffered to 10 items
@@ -100,7 +102,7 @@ func NewServer() *Server {
 
 // Spin up the server and listen for github webhook push events. The events will be passed to Server.Events channel.
 func (s *Server) ListenAndServe() error {
-	return http.ListenAndServe(":"+s.Port, s)
+	return http.ListenAndServe(s.Address+":"+s.Port, s)
 }
 
 // Inside a go-routine, spin up the server and listen for github webhook push events. The events will be passed to Server.Events channel.
