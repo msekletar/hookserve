@@ -8,7 +8,6 @@ import (
 	"github.com/bmatsuo/go-jsontree"
 	"io/ioutil"
 	"net/http"
-	"strconv"
 	"strings"
 )
 
@@ -81,7 +80,7 @@ func (e *Event) String() (output string) {
 }
 
 type Server struct {
-	Port       int        // Port to listen on. Defaults to 80
+	Port       string     // Port to listen on. Defaults to 80
 	Path       string     // Path to receive on. Defaults to "/postreceive"
 	Secret     string     // Option secret key for authenticating via HMAC
 	IgnoreTags bool       // If set to false, also execute command if tag is pushed
@@ -92,7 +91,7 @@ type Server struct {
 // By default the Port is set to 80 and the Path is set to `/postreceive`
 func NewServer() *Server {
 	return &Server{
-		Port:       80,
+		Port:       "80",
 		Path:       "/postreceive",
 		IgnoreTags: true,
 		Events:     make(chan Event, 10), // buffered to 10 items
@@ -101,7 +100,7 @@ func NewServer() *Server {
 
 // Spin up the server and listen for github webhook push events. The events will be passed to Server.Events channel.
 func (s *Server) ListenAndServe() error {
-	return http.ListenAndServe(":"+strconv.Itoa(s.Port), s)
+	return http.ListenAndServe(":"+s.Port, s)
 }
 
 // Inside a go-routine, spin up the server and listen for github webhook push events. The events will be passed to Server.Events channel.
